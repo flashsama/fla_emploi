@@ -30,7 +30,10 @@ class Fla_emploi_Activator {
 	 * @since    1.0.0
 	 */
 	public static function activate() {
-
+		//create the admin options page
+		
+		//create the custom post type "emploi"
+		//create the custom post type "entreprise"
 	}
 
 }
