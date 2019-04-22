@@ -100,4 +100,34 @@ class Fla_emploi_Admin {
 
 	}
 
+	//create custom post type emploi
+	public function create_emploi_post_type() {
+		register_post_type( 'fla_emploi',
+		  array(
+			'labels' => array(
+			  'name' => __( 'Emplois' ),
+			  'singular_name' => __( 'Emploi' )
+			),
+			'description' => 'Emploi ajouter par une entreprise.',
+			'public' => true,
+			'has_archive' => true,
+			'supports' => array( 'title', 'custom-fields' )
+		  )
+		);
+	  }
+	  public function create_entreprise_post_type() {
+		register_post_type( 'fla_entreprise',
+		  array(
+			'labels' => array(
+			  'name' => __( 'Entreprises' ),
+			  'singular_name' => __( 'Entreprise' )
+			),
+			'description' => 'entreprise ajouter par admin.',
+			'public' => true,
+			'has_archive' => true,
+			'supports' => array( 'title', 'custom-fields','featured-image' )
+		  )
+		);
+	  }
+
 }

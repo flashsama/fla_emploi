@@ -154,6 +154,11 @@ class Fla_emploi {
 
 		$plugin_admin = new Fla_emploi_Admin( $this->get_plugin_name(), $this->get_version() );
 
+		//create_emploi_post_type
+		$this->loader->add_action( 'init', $plugin_admin, 'create_emploi_post_type' );
+		//create_entreprise_post_type
+		$this->loader->add_action( 'init', $plugin_admin, 'create_entreprise_post_type' );
+
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 
@@ -172,6 +177,14 @@ class Fla_emploi {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+
+		//filter
+		$this->loader->add_filter('single_template', $plugin_public, 'my_custom_template', 10, 3);
+		
+		//widgets shortcode
+		$this->loader->add_action( 'init', $plugin_public, 'register_shortcodes' );
+		
+
 
 	}
 
