@@ -110,6 +110,10 @@ class Fla_emploi {
 		 * of the plugin.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-fla_emploi-i18n.php';
+		/**
+		 * The class responsible for requiring plugins
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-tgm-plugin-activation.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
@@ -158,9 +162,15 @@ class Fla_emploi {
 		$this->loader->add_action( 'init', $plugin_admin, 'create_emploi_post_type' );
 		//create_entreprise_post_type
 		$this->loader->add_action( 'init', $plugin_admin, 'create_entreprise_post_type' );
+		$this->loader->add_action( 'init', $plugin_admin, 'fla_emploi_register_fields' );
+		$this->loader->add_action( 'init', $plugin_admin, 'fla_emploi_add_role' );
+		$this->loader->add_action( 'admin_init', $plugin_admin, 'fla_emploi_diable_admin_for_manager' );
+		
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
+		$this->loader->add_action( 'tgmpa_register', $plugin_admin, 'fla_emploi_register_required_plugins' );
+		//add_action( 'tgmpa_register', 'my_theme_register_required_plugins' );
 
 	}
 
@@ -183,6 +193,7 @@ class Fla_emploi {
 		
 		//widgets shortcode
 		$this->loader->add_action( 'init', $plugin_public, 'register_shortcodes' );
+		$this->loader->add_action( 'template_include', $plugin_public, 'fla_emploi_redirect_to_login' );
 		
 
 

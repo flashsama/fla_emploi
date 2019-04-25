@@ -259,6 +259,29 @@ class Fla_emploi_Public {
 	public function register_shortcodes(){
 		add_shortcode( 'fl_emploi_recherche', array($this,'fl_search_fillter_widget') );
 		add_shortcode( 'fl_emploi_result', array($this,'fl_search_result_widget') );
+
+		//disable admin bar for managers
+		if (current_user_can('emploi_manager')) {
+			add_filter('show_admin_bar', '__return_false');
+		}
+		
+	}
+
+	public function fla_emploi_redirect_to_login($template)
+	{
+		$url_path = trim(parse_url(add_query_arg(array()), PHP_URL_PATH), '/');
+		echo "this is url " . plugin_dir_path( __FILE__ ) . 'partials/emploi-login.php';
+			if ( $url_path === 'login-manager' ) {
+				echo "succeed";
+				// load the file if exists
+				$load = locate_template(array('../partials/emploi-login.php'), true);
+				var_dump($load);
+				die();
+				if ($load) {
+					exit(); // just exit if template was found and loaded
+				}
+			}
+			return $template;
 	}
 
 }
