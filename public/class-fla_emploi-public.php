@@ -240,7 +240,7 @@ class Fla_emploi_Public {
 
 	/* Filter the single_template with our custom function*/
 
-		public function my_custom_template($single) {
+		public function fla_emploi_single_emploi_template($single) {
 
 			global $post;
 
