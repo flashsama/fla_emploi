@@ -267,18 +267,26 @@ class Fla_emploi_Public {
 		
 	}
 
-	public function fla_emploi_redirect_to_login($template)
+	public function fla_emploi_routing($template)
 	{
 		$url_path = trim(parse_url(add_query_arg(array()), PHP_URL_PATH), '/');
-		echo "this is url " . plugin_dir_path( __FILE__ ) . 'partials/emploi-login.php';
-			if ( $url_path === 'login-manager' ) {
-				echo "succeed";
+		//echo "this is url " . file_exists(plugin_dir_path( __FILE__ ) . 'partials/emploi-login.php');
+			if ( $url_path === 'manager-login' ) {
 				// load the file if exists
-				$load = locate_template(array('../partials/emploi-login.php'), true);
-				var_dump($load);
-				die();
-				if ($load) {
-					exit(); // just exit if template was found and loaded
+				$load = locate_template(array(plugin_dir_path( __FILE__ ).'partials/emploi-login.php'), true, false);
+				
+				if ($load === "") {
+					//exit(); // just exit if template was found and loaded
+					$template = plugin_dir_path( __FILE__ ).'partials/emploi-login.php';
+				}
+			}
+			if ( $url_path === 'manager-admin' ) {
+				// load the file if exists
+				$load = locate_template(array(plugin_dir_path( __FILE__ ).'partials/manager-admin.php'), true, false);
+				
+				if ($load === "") {
+					//exit(); // just exit if template was found and loaded
+					$template = plugin_dir_path( __FILE__ ).'partials/manager-admin.php';
 				}
 			}
 			return $template;

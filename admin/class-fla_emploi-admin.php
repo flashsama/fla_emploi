@@ -570,6 +570,26 @@ class Fla_emploi_Admin {
 							'max_size' => '',
 							'mime_types' => '',
 						),
+						array(
+							'key' => 'field_5cc1fa99ae977',
+							'label' => 'manager d\'entreprise',
+							'name' => 'manager_dentreprise',
+							'type' => 'user',
+							'instructions' => '',
+							'required' => 1,
+							'conditional_logic' => 0,
+							'wrapper' => array(
+								'width' => '',
+								'class' => '',
+								'id' => '',
+							),
+							'role' => array(
+								0 => 'emploi_manager',
+							),
+							'allow_null' => 0,
+							'multiple' => 0,
+							'return_format' => 'id',
+						)
 					),
 					'location' => array(
 						array(

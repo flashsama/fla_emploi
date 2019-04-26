@@ -9,7 +9,7 @@
  */
 
 get_header();
-die('hard');
+//die('hard');
 ?>
 
 	<!-- section -->
@@ -52,7 +52,7 @@ die('hard');
                     // Login form arguments.
                     $args = array(
                         'echo'           => true,
-                        'redirect'       => home_url( '/wp-admin/' ), 
+                        'redirect'       => home_url( '/manager-admin/' ), 
                         'form_id'        => 'loginform',
                         'label_username' => __( 'Username' ),
                         'label_password' => __( 'Password' ),

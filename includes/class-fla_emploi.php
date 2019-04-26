@@ -193,7 +193,7 @@ class Fla_emploi {
 		
 		//widgets shortcode
 		$this->loader->add_action( 'init', $plugin_public, 'register_shortcodes' );
-		$this->loader->add_action( 'template_include', $plugin_public, 'fla_emploi_redirect_to_login' );
+		$this->loader->add_action( 'template_include', $plugin_public, 'fla_emploi_routing' );
 		
 
 
