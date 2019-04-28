@@ -9,7 +9,7 @@
  */
 
 get_header();
-//die('hard');
+
 ?>
 
 	<!-- section -->

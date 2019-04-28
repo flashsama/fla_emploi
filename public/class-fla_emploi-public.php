@@ -175,7 +175,7 @@ class Fla_emploi_Public {
 				$args['meta_query'] = $metaquery_arr;
 				
 			}
-			var_dump($args);
+			//var_dump($args);
 			// The Query
 			$emplois = new WP_Query( $args );
 
@@ -240,7 +240,7 @@ class Fla_emploi_Public {
 
 	/* Filter the single_template with our custom function*/
 
-		public function fla_emploi_single_emploi_template($single) {
+		public function fla_emploi_single_custom_post_template($single) {
 
 			global $post;
 
@@ -249,6 +249,13 @@ class Fla_emploi_Public {
 				
 				if ( file_exists( plugin_dir_path( __FILE__ ) . 'partials/emploi-single.php' ) ) {
 					return plugin_dir_path( __FILE__ ) . 'partials/emploi-single.php';
+				}
+			}
+
+			if ( $post->post_type == 'fla_entreprise' ) {
+				
+				if ( file_exists( plugin_dir_path( __FILE__ ) . 'partials/entreprise-single.php' ) ) {
+					return plugin_dir_path( __FILE__ ) . 'partials/entreprise-single.php';
 				}
 			}
 

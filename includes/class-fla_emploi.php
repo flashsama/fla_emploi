@@ -189,7 +189,7 @@ class Fla_emploi {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 
 		//filter
-		$this->loader->add_filter('single_template', $plugin_public, 'fla_emploi_single_emploi_template', 10, 3);
+		$this->loader->add_filter('single_template', $plugin_public, 'fla_emploi_single_custom_post_template', 10, 3);
 		
 		//widgets shortcode
 		$this->loader->add_action( 'init', $plugin_public, 'register_shortcodes' );

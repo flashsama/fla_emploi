@@ -13,17 +13,17 @@ get_header(); ?>
 
 		<?php
         while ( have_posts() ) : the_post();
-        var_dump(get_fields());
+        //var_dump(get_fields());
         ?>
             <h2>Intitulé du post : </h2>
             <h3><?php the_title(); ?></h3>
             <h2>Fonction : </h2>
             <h3><?php the_field('fonction'); ?></h3>
             <h2>Localisation : </h2>
-            <h3><?php echo "(" . the_field('longitude') . "," . the_field('latitude') . ")"; ?></h3>
+            <h3><?php echo "(" . get_field('longitude') . "," . get_field('latitude') . ")"; ?></h3>
             <h2>Description du post : </h2>
             <p><?php the_field('descriptif'); ?></p>
-            <h2>Description du post : </h2>
+            <h2>Profil recherché : </h2>
             <p><?php the_field('profil_recherche'); ?></p>
             <h2>Fiche de poste : </h2>
             <p><a target="_blank" href="<?php the_field('fiche_de_poste'); ?>">Telecharger le PDF</a></p>
