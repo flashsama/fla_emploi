@@ -16,10 +16,46 @@
     padding: 2rem 0;
     grid-template-columns: 1fr 1fr 1fr;
     grid-column-gap: 1.4rem;
+    grid-row-gap: 1.4rem;
  }
 
  div.result_item {
     padding: 1rem;
     text-align: center;
     border: 1px solid rgba(0,0,0,0.1);
+}
+
+div.result_item a div p {
+   color: black;
+}
+
+/* edit entreprise form */
+.fla_edit_entreprise_container {
+   padding: 2rem;
+   border: 1px solid #E9E9E9;
+   position: relative;
+   background: white;
+   top: 50px;
+   width: 800px;
+   z-index: 9999999999;
+   left: calc(50% - 400px);
+   box-shadow: 0px 0px 19px;
+   margin-bottom: 4rem;
+}
+.fla_edit_entreprise_container>form>div {
+   margin: 13px;
+}
+.fla_edit_entreprise_container>form>div>label {
+   display: block;
+   font-weight: 600;
+   margin-bottom: 7px;
+}
+.fla_edit_entreprise_container>form>div>input {
+   width: 100%;
+}
+.btn {
+   display: inline-block;
+   padding: 7px 20px;
+   background: #15a92f;
+   color: white;
 }

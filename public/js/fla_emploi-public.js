@@ -29,4 +29,14 @@
 	 * practising this, we should strive to set a better example in our own work.
 	 */
 
+	$(function() {
+		console.log($('#fla_edit_entreprise_btn'));
+		$("#fla_edit_entreprise_btn").click(function(e){
+			alert(1);
+			e.preventDefault();
+			$('.fla_edit_entreprise_container').show();
+			var aTag = $('.fla_edit_entreprise_container')[0];
+			$('html,body').animate({scrollTop: aTag.offset().top},'slow');
+		});
+	 });
 })( jQuery );

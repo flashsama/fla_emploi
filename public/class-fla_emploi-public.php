@@ -191,22 +191,26 @@ class Fla_emploi_Public {
 					?>
 					
 						<div class="result_item">
-							<h3><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
-							<h5><?php the_field('type_de_contrat') ?></h5>
-							<?php 
-							$entreprise = get_field('entreprise');
-							if( $entreprise ): ?>
-								<?php foreach( $entreprise as $p): // variable must be called $p (IMPORTANT)
-									//var_dump($p);
+							<a href="<?php the_permalink(); ?>">
+								<div>
+									<h3><?php the_title(); ?></h3>
+									<h5><?php the_field('type_de_contrat') ?></h5>
+									<h5><?php the_field('localisation') ?></h5>
+									<?php 
+									$entreprise = get_field('entreprise');
+									if( $entreprise ): ?>
+										<?php foreach( $entreprise as $p): // variable must be called $p (IMPORTANT)
+											//var_dump($p);
+											?>
+												<h2><?php echo get_the_title($p->ID); ?></h2>
+												<img style="height: 100px;" src="<?php the_field('logo', $p->ID); ?>" />
+										<?php endforeach; ?>
+										
+									<?php endif; 
 									?>
-										<a href="<?php the_permalink($p->ID); ?>"><h2><?php echo get_the_title($p->ID); ?></h2></a>
-										<img src="<?php the_field('logo', $p->ID); ?>" />
-								<?php endforeach; ?>
-								
-							<?php endif; 
-							?>
-							<p><?php the_field('descriptif'); ?></p>
-							
+									<p><?php echo substr(get_field('descriptif'),0,120).'...';  ?></p>
+								</div>
+							</a>
 						</div>
 					
 					<?php
@@ -220,22 +224,6 @@ class Fla_emploi_Public {
 			// Restore original Post Data
 			wp_reset_postdata();
 		
-		?>
-		<div class="result_container">
-			<div class="result_item">
-				<h3>titre de l'offre</h3>
-				<h4>entreprise</h4>
-				<p>descriptif Lorem ipsum dolor sit amet consectetur adipisicing elit. Velit deserunt consequuntur harum aut ipsum, laudantium non similique, dolor officia praesentium voluptas tenetur beatae esse autem laborum unde quos libero earum!</p>
-				<h5>CDI</h5>
-			</div>
-			<div class="result_item">
-				<h3>titre de l'offre</h3>
-				<h4>entreprise</h4>
-				<p>descriptif Lorem ipsum dolor sit amet consectetur adipisicing elit. Velit deserunt consequuntur harum aut ipsum, laudantium non similique, dolor officia praesentium voluptas tenetur beatae esse autem laborum unde quos libero earum!</p>
-				<h5>CDI</h5>
-			</div>
-		</div>
-		<?php
 		}
 
 	/* Filter the single_template with our custom function*/

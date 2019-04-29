@@ -11,22 +11,29 @@ if (!is_user_logged_in()) {
     wp_redirect( '/manager-login' );
     exit;
 }
-$entreprise = get_posts(array(
-	'numberposts'	=> 1,
+
+$entreprises = get_posts(array(
+	'numberposts'	=> -1,
 	'post_type'		=> 'fla_entreprise',
 	'meta_key'		=> 'manager_dentreprise',
-	'meta_value'	=> $user_id
+	'meta_value'	=> $user_ID
 ));
-$entreprise = $entreprise[0];
-echo '<pre>';
-//var_dump   ($entreprise);
-echo '</pre>';
+// $entreprise = $entreprise[0];
+// echo '<pre>';
+// var_dump   ($entreprises);
+// echo '</pre>';
 get_header(); ?>
 
 	<h1>Manager panel</h1>
 
     <h2>Bienvenue : <?php echo $user_login; ?></h2>
-    <a href="<?php the_permalink($entreprise->ID); ?>"><h3>entreprise : <?php echo $entreprise->post_title; ?></h3></a>
+    <?php
+    foreach ($entreprises as $entreprise) {
+        ?>
+        <a href="<?php the_permalink($entreprise->ID); ?>"><h3>entreprise : <?php echo $entreprise->post_title; ?></h3></a>
+        <?php
+    }
+    ?>
 
 <?php
 
