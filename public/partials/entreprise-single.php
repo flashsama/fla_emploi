@@ -17,7 +17,7 @@ get_header(); ?>
         if(is_user_logged_in() && $user_ID == $managerID){
             echo 'you can edit';
             ?>
-            <a href="#" id="#fla_edit_entreprise_btn" >Modifier entreprise</a>
+            <a href="#" id="fla_edit_entreprise_btn" >Modifier entreprise</a>
             <?php 
         }else {
             echo 'you can not edit';
@@ -25,7 +25,8 @@ get_header(); ?>
         //var_dump(get_fields());
         ?>
             <h3><?php the_title(); ?></h3>
-            <img src="<?php the_field('logo'); ?>" />
+            <?php $entreprise_logo = json_decode(json_encode(get_field('logo')), FALSE); ?>
+            <img src="<?php echo $entreprise_logo->url; ?>" />
             <p><?php the_field('secteur_dactivites'); ?></p>
             <p><?php the_field('descriptif'); ?></p>
             <p><?php the_field('adresse'); ?></p>
@@ -71,20 +72,27 @@ get_header(); ?>
         <?php
 		endwhile; // End of the loop.
 		?>
-        <div class="fla_edit_entreprise_container" style="display:none;">
+        <div id="entreprise_edit_section" class="fla_edit_entreprise_container" style="display:none;">
             <h2 style="text-align:center;">Modifier Entreprise</h2>
             <form>
-                <div>
+                <div class="input-field">
                     <label for="title">Nomination</label>
-                    <input type="text" name="title" id="fla_title_txt" value="<?php the_title(); ?>">
+                    <input type="text" name="title" id="fla_title_txt" value="<?php the_title(); ?>" minlength="1">
                 </div>
-                <div>
+                
+                <div class="">
+                    <label>Logo</label>
+                    <img id="entreprise_logo_edit" width="100px" src="<?php echo $entreprise_logo->url; ?>" />
+                    <input type="hidden" id="entreprise_logo_id" value="<?php echo $entreprise_logo->id; ?>">
+                    <a class="btn-floating btn cyan" id="upload_logo_btn"><i class="material-icons">edit</i></a>
+                </div>
+                <div class="input-field">
                     <label for="descriptif">Descriptif</label>
-                    <textarea name="descriptif" id="fla_descriptif_txt" rows="5"><?php the_field('descriptif') ?></textarea>
+                    <textarea class="materialize-textarea" name="descriptif" id="fla_descriptif_txt" rows="5" minlength="20"><?php the_field('descriptif') ?></textarea>
                 </div>
-                <div>
+                <div class="input-field">
                     <label for="adresse">Adresse</label>
-                    <input type="text" name="adresse" id="fla_adresse_txt" value="<?php the_field('adresse'); ?>">
+                    <input type="text" name="adresse" id="fla_adresse_txt" value="<?php the_field('adresse'); ?>" minlength="6">
                 </div>
                 <div>
                     <label for="Secteur">Secteur d'activités</label>
@@ -101,27 +109,34 @@ get_header(); ?>
                         <option value="Automobile, matériels de transport, réparation" <?php if( get_field('secteur_dactivites') == "Automobile, matériels de transport, réparation" ): ?> selected="selected"<?php endif; ?>>Automobile, matériels de transport, réparation</option>
                     </select>
                 </div>
-                <div>
+                <div class="input-field">
                     <label for="telephone">telephone</label>
-                    <input type="text" name="telephone" id="fla_telephone_txt" value="<?php the_field('telephone'); ?>">
+                    <input type="text" name="telephone" id="fla_telephone_txt" value="<?php the_field('telephone'); ?>" minlength="10">
                 </div>
-                <div>
+                <div class="input-field">
                     <label for="email">Email</label>
-                    <input type="text" name="email" id="fla_email_txt" value="<?php the_field('mail'); ?>">
+                    <input type="email" name="email" id="fla_email_txt" value="<?php the_field('mail'); ?>" required minlength="5">
                 </div>
-                <div>
+                <div class="input-field">
                     <label for="site web">site web</label>
-                    <input type="text" name="site web" id="fla_site web_txt" value="<?php the_field('site_internet'); ?>">
+                    <input type="text" name="site web" id="fla_site_web_txt" value="<?php the_field('site_internet'); ?>">
                 </div>
-                <div>
+                <div class="input-field">
                     <label for="longitude">longitude</label>
-                    <input type="text" name="longitude" id="fla_longitude_txt" value="<?php the_field('longitude'); ?>">
+                    <input type="text" name="longitude" id="fla_longitude_txt" value="<?php the_field('longitude'); ?>" minlength="8" maxlength="8">
                 </div>
-                <div>
+                <div class="input-field">
                     <label for="latitude">latitude</label>
-                    <input type="text" name="latitude" id="fla_latitude_txt" value="<?php the_field('latitude'); ?>">
+                    <input type="text" name="latitude" id="fla_latitude_txt" value="<?php the_field('latitude'); ?>" minlength="8" maxlength="8">
                 </div>
+                <input type="hidden" id="entrepriseID" value="<?php echo get_the_ID(); ?>">
             </form>
+            <div class="red-text card-panel" id="error_update_entreprise" style="display:none;">
+                une erreur est survenu lors de l'enregistrement de vos données! veuillez resayer plus tard
+            </div>
+            <div class="progress" style="display:none;">
+                <div class="indeterminate"></div>
+            </div>
             <a class="btn" href="#" id="fla_emploi_update_data_entreprise_btn" style="left: calc(100% - 135px);position: relative;">Enregistrer</a>
         </div>
 		</main><!-- #main -->

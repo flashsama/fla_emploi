@@ -578,7 +578,7 @@ class Fla_emploi_Admin {
 								'class' => '',
 								'id' => '',
 							),
-							'return_format' => 'url',
+							'return_format' => 'object',
 							'preview_size' => 'thumbnail',
 							'library' => 'all',
 							'min_width' => '',
@@ -637,14 +637,27 @@ class Fla_emploi_Admin {
 			add_role(
 				'emploi_manager',
 				__( 'Manager d\'emploi' )
-		);
+			);
+			$role = get_role('emploi_manager');
+			$role->add_cap(
+				'read'
+			);
+			$role->add_cap(
+				'edit_posts'
+			);
+			$role->add_cap(
+				'upload_files'
+			);
 		}
 		public function fla_emploi_diable_admin_for_manager()
 		{
-				if (current_user_can('emploi_manager') && is_admin()) {
+				$url_path = trim(parse_url(add_query_arg(array()), PHP_URL_PATH), '/');
+				if (current_user_can('emploi_manager') && $url_path === "wp-admin") {
 					wp_redirect(home_url());
 					exit;
 				}
 		}
+
+		
 
 }

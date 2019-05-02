@@ -18,6 +18,8 @@ $entreprises = get_posts(array(
 	'meta_key'		=> 'manager_dentreprise',
 	'meta_value'	=> $user_ID
 ));
+
+var_dump(wp_get_current_user());
 // $entreprise = $entreprise[0];
 // echo '<pre>';
 // var_dump   ($entreprises);

@@ -73,6 +73,11 @@ class Fla_emploi_Public {
 		 * class.
 		 */
 
+		/* enqueue material icons */ 
+		wp_enqueue_style( $this->plugin_name.'_material_icons', 'https://fonts.googleapis.com/icon?family=Material+Icons', array(), $this->version, 'all' );
+
+		
+		wp_enqueue_style( $this->plugin_name.'_materializecss', plugin_dir_url( __FILE__ ) . 'css/materialize.min.css', array(), $this->version, 'all' );
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/fla_emploi-public.css', array(), $this->version, 'all' );
 
 	}
@@ -96,7 +101,12 @@ class Fla_emploi_Public {
 		 * class.
 		 */
 
+		/* enqueu media to be used in front end*/
+		wp_enqueue_media();
+
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/fla_emploi-public.js', array( 'jquery' ), $this->version, false );
+		wp_localize_script( $this->plugin_name, 'ajax_front_obj', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+		wp_enqueue_script( $this->plugin_name.'_materializejs', plugin_dir_url( __FILE__ ) . 'js/materialize.min.js', array( 'jquery' ), $this->version, false );
 
 	}
 
@@ -228,28 +238,28 @@ class Fla_emploi_Public {
 
 	/* Filter the single_template with our custom function*/
 
-		public function fla_emploi_single_custom_post_template($single) {
+	public function fla_emploi_single_custom_post_template($single) {
 
-			global $post;
+		global $post;
 
-			/* Checks for single template by post type */
-			if ( $post->post_type == 'fla_emploi' ) {
-				
-				if ( file_exists( plugin_dir_path( __FILE__ ) . 'partials/emploi-single.php' ) ) {
-					return plugin_dir_path( __FILE__ ) . 'partials/emploi-single.php';
-				}
+		/* Checks for single template by post type */
+		if ( $post->post_type == 'fla_emploi' ) {
+			
+			if ( file_exists( plugin_dir_path( __FILE__ ) . 'partials/emploi-single.php' ) ) {
+				return plugin_dir_path( __FILE__ ) . 'partials/emploi-single.php';
 			}
-
-			if ( $post->post_type == 'fla_entreprise' ) {
-				
-				if ( file_exists( plugin_dir_path( __FILE__ ) . 'partials/entreprise-single.php' ) ) {
-					return plugin_dir_path( __FILE__ ) . 'partials/entreprise-single.php';
-				}
-			}
-
-			return $single;
-
 		}
+
+		if ( $post->post_type == 'fla_entreprise' ) {
+			
+			if ( file_exists( plugin_dir_path( __FILE__ ) . 'partials/entreprise-single.php' ) ) {
+				return plugin_dir_path( __FILE__ ) . 'partials/entreprise-single.php';
+			}
+		}
+
+		return $single;
+
+	}
 
 	public function register_shortcodes(){
 		add_shortcode( 'fl_emploi_recherche', array($this,'fl_search_fillter_widget') );
@@ -265,13 +275,12 @@ class Fla_emploi_Public {
 	public function fla_emploi_routing($template)
 	{
 		$url_path = trim(parse_url(add_query_arg(array()), PHP_URL_PATH), '/');
-		//echo "this is url " . file_exists(plugin_dir_path( __FILE__ ) . 'partials/emploi-login.php');
+		
 			if ( $url_path === 'manager-login' ) {
 				// load the file if exists
 				$load = locate_template(array(plugin_dir_path( __FILE__ ).'partials/emploi-login.php'), true, false);
 				
 				if ($load === "") {
-					//exit(); // just exit if template was found and loaded
 					$template = plugin_dir_path( __FILE__ ).'partials/emploi-login.php';
 				}
 			}
@@ -280,11 +289,100 @@ class Fla_emploi_Public {
 				$load = locate_template(array(plugin_dir_path( __FILE__ ).'partials/manager-admin.php'), true, false);
 				
 				if ($load === "") {
-					//exit(); // just exit if template was found and loaded
 					$template = plugin_dir_path( __FILE__ ).'partials/manager-admin.php';
 				}
 			}
 			return $template;
+	}
+
+
+	/**ajax */
+	public function fla_emploi_update_entreprise()
+	{
+		//init output object
+		$output = new StdClass();
+		$output->status = 'success';
+		$output->errorText = '';
+		$output->result = '';
+
+		//retrieve post data
+	
+		$entrepriseID = (isset($_POST['id'])) ? $_POST['id'] : '';
+		$title = (isset($_POST['title'])) ? $_POST['title'] : '';
+		
+		$descriptif = (isset($_POST['descriptif'])) ? $_POST['descriptif'] : '';
+		$adresse = (isset($_POST['adresse'])) ? $_POST['adresse'] : '';
+		$email = (isset($_POST['email'])) ? $_POST['email'] : '';
+		$secteur = (isset($_POST['secteur'])) ? $_POST['secteur'] : '';
+		$site = (isset($_POST['site'])) ? $_POST['site'] : '';
+		$telephone = (isset($_POST['telephone'])) ? $_POST['telephone'] : '';
+		$latitude = (isset($_POST['latitude'])) ? $_POST['latitude'] : '';
+		$longitude = (isset($_POST['longitude'])) ? $_POST['longitude'] : '';
+		$logo = (isset($_POST['logoID'])) ? (int)$_POST['logoID'] : '';
+
+		//save acf fields in an array
+		$entreprise_fields_arr = array(
+			'descriptif'         => $descriptif,
+			'adresse'            => $adresse,
+			'mail'               => $email,
+			'telephone'          => $telephone,
+			'site_internet'      => $site,
+			'longitude'          => $longitude,
+			'latitude'           => $latitude,
+			'secteur_dactivites' => $secteur,
+			'logo'               => $logo
+
+		);
+
+		//if id of entreprise not defined exit and throw error
+		if ($entrepriseID === '') {
+			$output->status = 'error';
+			$output->errorText = 'entreprise ID not found';
+			echo  json_encode($output);
+			wp_die();
+		}
+		
+		//update the post title
+		$currentEntreprise = array(
+			'ID'           => $entrepriseID,
+			'post_title'   => $title
+		);
+
+		$entreprise_updated = wp_update_post($currentEntreprise, true);
+		//if post title not updated halt and throw error
+		if (is_wp_error($entreprise_updated)) {
+			
+			$output->status = 'error';
+			$errors = $entreprise_updated->get_error_messages();
+			foreach ($errors as $error) {
+				$output->errorText .= " ".$error;
+			}
+			echo  json_encode($output);
+			wp_die();
+		}else {
+			//if post title update then update extra fields (acf)
+			foreach ($entreprise_fields_arr as $field_name => $field_value) {
+				$field_updated = update_field($field_name, $field_value, $entrepriseID);
+				//if a field not updated throw error
+				if (!$field_updated) {
+					$output->errorText .= 'can\'t update ' .$field_name.' ';
+				}
+			}
+		}
+
+		echo  json_encode($output);
+		wp_die();
+	}
+
+	public function fla_emploi_show_current_user_attachments( $query = array() ) {
+		$user_id = get_current_user_id();
+		if(current_user_can('emploi_manager')){
+			if( $user_id ) {
+				$query['author'] = $user_id;
+			}
+		}
+		
+		return $query;
 	}
 
 }
