@@ -17,7 +17,9 @@ get_header(); ?>
         if(is_user_logged_in() && $user_ID == $managerID){
             echo 'you can edit';
             ?>
-            <a href="#" id="fla_edit_entreprise_btn" >Modifier entreprise</a>
+            <a href="#" class="btn" id="fla_edit_entreprise_btn" ><i class="material-icons right">edit</i>Modifier entreprise</a>
+            
+
             <?php 
         }else {
             echo 'you can not edit';
@@ -39,7 +41,10 @@ get_header(); ?>
             <?php 
             
             $manager = get_user_by('id',$managerID);
-            echo $manager->data->display_name;
+            if($manager){
+                echo $manager->data->display_name;
+            }
+            
             //var_dump($manager);
             ?>
             <h3>Toutes les offres de cette entreprise</h3>
@@ -56,22 +61,176 @@ get_header(); ?>
                     )
                 ));
                 ?>
-                <ul>
+                <ul class="collection fla_emploi_ul">
                 <?php
                 foreach ($emplois as $emploi) {
+                   // var_dump($emploi);
                    ?>
-                   <li><a href="<?php the_permalink($emploi->ID); ?>"><?php echo get_the_title($emploi->ID); ?></a></li>
+                   <li class="collection-item" id="item_<?php echo $emploi->ID; ?>">
+                    <a href="<?php the_permalink($emploi->ID); ?>"><?php echo get_the_title($emploi->ID); ?></a>
+                    <div class="secondary-content">
+                        <a href="<?php echo $emploi->guid; ?>" class="btn-floating btn-small"><i class="material-icons right">remove_red_eye</i></a>
+                        <a href="/edit_emploi?eid=<?php echo $emploi->ID; ?>" class="btn-floating btn-small"><i class="material-icons right">edit</i></a>
+                        <a href="#" data="<?php echo $emploi->ID; ?>" class="btn-floating btn-small red delete_emploi_btn"><i class="material-icons right">delete</i></a>
+                        <a href="#" data="<?php echo $emploi->ID; ?>" class="btn-floating btn-small red archive_emploi_btn"><i class="material-icons right">archive</i></a>
+                    </div>
+                    </li>
                    <?php
                 }
                 ?>
                 </ul>
+                <div class="right">
+                Ajouter une offre <a href="/ajouter-emploi" class="btn-floating right" id="" ><i class="material-icons right">add</i></a>
+                </div>
+                <div style="clear: both;"></div>
                 <?php
                 //var_dump($emplois);
             ?>
             
+            <h3>Toutes les sollicitaion de cette entreprise</h3>
+            <?php
+                $eid = (int)get_the_ID();
+                $sollicitations = get_posts(array(
+                    'numberposts'	=> -1,
+                    'post_type'		=> 'fla_sollicitation',
+                    'meta_query' => array(
+                        array(
+                            'key' => 'entreprise', // name of custom field
+                            'value' => $eid,//'"' . get_the_ID() . '"', // matches exactly "123", not just 123. This prevents a match for "1234"
+                            'compare' => 'LIKE'
+                        )
+                    )
+                ));
+                
+                ?>
+                <ul class="collection fla_emploi_ul">
+                <?php
+                foreach ($sollicitations as $sollicitation) {
+                   // var_dump($sollicitation);
+                   ?>
+                   <li class="collection-item" id="item_<?php echo $sollicitation->ID; ?>">
+                    <a href="<?php the_permalink($sollicitation->ID); ?>"><?php echo get_the_title($sollicitation->ID); ?></a>
+                    <div class="secondary-content">
+                        <a href="<?php echo $sollicitation->guid; ?>" class="btn-floating btn-small"><i class="material-icons right">remove_red_eye</i></a>
+                        <a href="/edit_sollicitation?id=<?php echo $sollicitation->ID; ?>" class="btn-floating btn-small"><i class="material-icons right">edit</i></a>
+                        <a href="#" data="<?php echo $sollicitation->ID; ?>" class="btn-floating btn-small red delete_sollicitation_btn"><i class="material-icons right">delete</i></a>
+                        <a href="#" data="<?php echo $sollicitation->ID; ?>" class="btn-floating btn-small red archive_sollicitation_btn"><i class="material-icons right">archive</i></a>
+                    </div>
+                    </li>
+                   <?php
+                }
+                ?>
+                </ul>
+                <div class="right">
+                Ajouter une sollicitation <a href="/ajouter-sollicitation" class="btn-floating right" id="" ><i class="material-icons right">add</i></a>
+                </div>
+                <div style="clear: both;"></div>
+
         <?php
 		endwhile; // End of the loop.
-		?>
+        ?>
+        <!-- modal confirmation -->
+        <div id="delete_confirm_modal" class="modal">
+            <div class="modal-content">
+                <h4>Confirmer la suppression</h4>
+                <p>Voulez vous supprimer cette offre ?</p>
+                <input type="hidden" id="emploi_id_to_delete" value="0">
+                <div class="preloader-wrapper active" style="display:none">
+                    <div class="spinner-layer spinner-red-only">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
+                    </div><div class="gap-patch">
+                        <div class="circle"></div>
+                    </div><div class="circle-clipper right">
+                        <div class="circle"></div>
+                    </div>
+                    </div>
+                </div>
+                <div style="display:none;" class="error_container"><p>une erreur s'est produite, impossible de supprimer l'offre, veuillez ressayer plus tard!</p><a href="#!" class="modal-close waves-effect waves-green btn">Fermer</a></div>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class="modal-close waves-effect waves-green btn">Non</a>
+                <a href="#!" id="delete_emploi_confirm" class="waves-effect waves-green btn red">Oui</a>
+            </div>
+        </div>
+        <!-- end modal --> 
+
+        <!-- modal confirmation archive-->
+        <div id="archive_confirm_modal" class="modal">
+            <div class="modal-content">
+                <h4>Confirmer l'archivage'</h4>
+                <p>Voulez vous archiver cette offre ?</p>
+                <input type="hidden" id="emploi_id_to_archive" value="0">
+                <div class="preloader-wrapper active" style="display:none">
+                    <div class="spinner-layer spinner-red-only">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
+                    </div><div class="gap-patch">
+                        <div class="circle"></div>
+                    </div><div class="circle-clipper right">
+                        <div class="circle"></div>
+                    </div>
+                    </div>
+                </div>
+                <div style="display:none;" class="error_container"><p>une erreur s'est produite, impossible d'archiver' l'offre. Veuillez ressayer plus tard!</p><a href="#!" class="modal-close waves-effect waves-green btn">Fermer</a></div>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class="modal-close waves-effect waves-green btn">Non</a>
+                <a href="#!" id="archive_emploi_confirm" class="waves-effect waves-green btn red">Oui</a>
+            </div>
+        </div>
+        <!-- end modal --> 
+        <!-- modal confirmation -->
+        <div id="delete_sollicitation_confirm_modal" class="modal">
+            <div class="modal-content">
+                <h4>Confirmer la suppression</h4>
+                <p>Voulez vous supprimer cette sollicitation ?</p>
+                <input type="hidden" id="sollicitation_id_to_delete" value="0">
+                <div class="preloader-wrapper active" style="display:none">
+                    <div class="spinner-layer spinner-red-only">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
+                    </div><div class="gap-patch">
+                        <div class="circle"></div>
+                    </div><div class="circle-clipper right">
+                        <div class="circle"></div>
+                    </div>
+                    </div>
+                </div>
+                <div style="display:none;" class="error_container"><p>une erreur s'est produite, impossible de supprimer la sollicitation, veuillez ressayer plus tard!</p><a href="#!" class="modal-close waves-effect waves-green btn">Fermer</a></div>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class="modal-close waves-effect waves-green btn">Non</a>
+                <a href="#!" id="delete_sollicitation_confirm" class="waves-effect waves-green btn red">Oui</a>
+            </div>
+        </div>
+        <!-- end modal --> 
+
+        <!-- modal confirmation archive-->
+        <div id="archive_sollicitation_confirm_modal" class="modal">
+            <div class="modal-content">
+                <h4>Confirmer l'archivage'</h4>
+                <p>Voulez vous archiver cette offre ?</p>
+                <input type="hidden" id="sollicitation_id_to_archive" value="0">
+                <div class="preloader-wrapper active" style="display:none">
+                    <div class="spinner-layer spinner-red-only">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
+                    </div><div class="gap-patch">
+                        <div class="circle"></div>
+                    </div><div class="circle-clipper right">
+                        <div class="circle"></div>
+                    </div>
+                    </div>
+                </div>
+                <div style="display:none;" class="error_container"><p>une erreur s'est produite, impossible d'archiver' l'offre. Veuillez ressayer plus tard!</p><a href="#!" class="modal-close waves-effect waves-green btn">Fermer</a></div>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class="modal-close waves-effect waves-green btn">Non</a>
+                <a href="#!" id="archive_sollicitation_confirm" class="waves-effect waves-green btn red">Oui</a>
+            </div>
+        </div>
+        <!-- end modal --> 
         <div id="entreprise_edit_section" class="fla_edit_entreprise_container" style="display:none;">
             <h2 style="text-align:center;">Modifier Entreprise</h2>
             <form>

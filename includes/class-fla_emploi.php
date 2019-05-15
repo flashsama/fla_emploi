@@ -162,6 +162,10 @@ class Fla_emploi {
 		$this->loader->add_action( 'init', $plugin_admin, 'create_emploi_post_type' );
 		//create_entreprise_post_type
 		$this->loader->add_action( 'init', $plugin_admin, 'create_entreprise_post_type' );
+		//create_sollicitation_post_type
+		$this->loader->add_action( 'init', $plugin_admin, 'create_sollicitation_post_type' );
+
+
 		$this->loader->add_action( 'init', $plugin_admin, 'fla_emploi_register_fields' );
 		$this->loader->add_action( 'init', $plugin_admin, 'fla_emploi_add_role' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'fla_emploi_diable_admin_for_manager' );
@@ -193,11 +197,21 @@ class Fla_emploi {
 		/*ajax*/
 
 		$this->loader->add_action( 'wp_ajax_update_entreprise', $plugin_public, 'fla_emploi_update_entreprise' );
+		$this->loader->add_action( 'wp_ajax_update_emploi_data', $plugin_public, 'fla_emploi_update_emploi_data' );
+		$this->loader->add_action( 'wp_ajax_update_sollicitation_data', $plugin_public, 'fla_emploi_update_sollicitation_data' );
+		$this->loader->add_action( 'wp_ajax_add_new_emploi', $plugin_public, 'fla_emploi_add_new_emploi' );
+		$this->loader->add_action( 'wp_ajax_add_new_sollicitation', $plugin_public, 'fla_emploi_add_new_sollicitation' );
+		$this->loader->add_action( 'wp_ajax_delete_emploi', $plugin_public, 'fla_emploi_delete_emploi' );
+		$this->loader->add_action( 'wp_ajax_delete_sollicitation', $plugin_public, 'fla_emploi_delete_sollicitation' );
+		$this->loader->add_action( 'wp_ajax_archive_emploi', $plugin_public, 'fla_emploi_archive_emploi' );
+		$this->loader->add_action( 'wp_ajax_archive_sollicitation', $plugin_public, 'fla_emploi_archive_sollicitation' );
 		
 
 		//filter
 		$this->loader->add_filter('single_template', $plugin_public, 'fla_emploi_single_custom_post_template', 10, 3);
-		//$this->loader->add_filter('ajax_query_attachments_args', $plugin_public, 'fla_emploi_show_current_user_attachments', 10, 3);
+		$this->loader->add_filter('ajax_query_attachments_args', $plugin_public, 'fla_emploi_show_current_user_attachments', 10, 3);
+		$this->loader->add_filter('wp_title', $plugin_public, 'fla_emploi_filter_title', 10, 3);
+		// 'wp_title', 'filter_function_name', 10, 2 
 		
 		//widgets shortcode
 		$this->loader->add_action( 'init', $plugin_public, 'register_shortcodes' );
