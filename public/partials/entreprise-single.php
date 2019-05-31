@@ -49,13 +49,14 @@ get_header(); ?>
             ?>
             <h3>Toutes les offres de cette entreprise</h3>
             <?php
+                $eid = (int)get_the_ID();
                 $emplois = get_posts(array(
                     'numberposts'	=> -1,
                     'post_type'		=> 'fla_emploi',
                     'meta_query' => array(
                         array(
                             'key' => 'entreprise', // name of custom field
-                            'value' => '"' . get_the_ID() . '"', // matches exactly "123", not just 123. This prevents a match for "1234"
+                            'value' => $eid,//'"' . get_the_ID() . '"', // matches exactly "123", not just 123. This prevents a match for "1234"
                             'compare' => 'LIKE'
                         )
                     )
