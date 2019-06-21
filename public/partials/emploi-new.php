@@ -22,6 +22,15 @@ $entreprises = get_posts(array(
 	'meta_value'	=> $user_ID
 ));
 
+
+$field_fonction = get_field_object('field_5cd6fcbaaf352');
+$fonction_choices = $field_fonction['choices'];
+
+$field_type_contrat = get_field_object('field_5cb8f9edf7c23');
+$type_contrat_choices = $field_type_contrat['choices'];
+
+$field_localisatation = get_field_object('field_5cb8fbe0f8b2a');
+$localisatation_choices = $field_localisatation['choices'];
         
 get_header(); ?>
 
@@ -39,9 +48,13 @@ get_header(); ?>
                 <div class="row">
                     <div class="input-field col s12">
                         <select id="type_de_contrat" name="type_de_contrat">
-                            <option value="cdi">CDI</option>
-                            <option value="cdd">CDD</option>
-                            <option value="freelance">Freelance</option>
+                        <?php 
+                            foreach ($type_contrat_choices as $value => $label) {
+                                ?>
+                                <option value="<?php echo $value; ?>"><?php echo $label; ?></option>
+                                <?php
+                            }
+                        ?>
                         </select>
                         <label for="type_de_contrat">Type de contrat</label>
                     </div>
@@ -49,23 +62,29 @@ get_header(); ?>
                 <div class="row">
                     <div class="input-field col s12">
                         <select id="emploi_fonction" name="emploi_fonction">
-                            <option value="commercial">Commercial, vente</option>
-                            <option value="informatique">Informatique, nouvelles technologies</option>
-                            <option value="gestion">Gestion, comptabilité, finance</option>
-                            <option value="production">Production, maintenance, qualité</option>
-                            <option value="marketing">Marketing, communication</option>
-                            <option value="r_et_d">R&D, gestion de projets</option>
-                            <option value="rh">RH, formation</option>
-                            <option value="secretariat">Secretariat, assistanat</option>
-                            <option value="services">Métiers des services</option>
-                            <option value="management">Management, direction générale</option>
+                        <?php 
+                            foreach ($fonction_choices as $value => $label) {
+                                ?>
+                                <option value="<?php echo $value; ?>"><?php echo $label; ?></option>
+                                <?php
+                            }
+                        ?>
                         </select>
                         <label for="emploi_fonction">Fonction</label>
                     </div>
                 </div>
                 <div class="row">
                     <div class="input-field col s12">
-                        <input value="" id="emploi_localisation" type="text" class="validate">
+                    <select id="emploi_localisation" name="emploi_localisation">
+                    
+                    <?php
+                    foreach ($localisatation_choices as $value => $label) {
+                        ?>
+                        <option value="<?php echo $value; ?>"><?php echo $label; ?></option>
+                        <?php
+                    }
+                    ?>
+                    </select>
                         <label for="emploi_localisation">Localisation</label>
                     </div>
                 </div>

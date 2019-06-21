@@ -320,42 +320,53 @@
 				'value' : $('#emploi_fonction :selected').val(),
 				'label' : $('#emploi_fonction :selected').text()
 			};
-			if ($('#emploi_localisation').val().length < 3) {
-				//show error and return
-				$('#emploi_localisation').addClass('invalid');
-				$('form>.progress').hide();
-				$('#update_emploi_btn').attr('disabled',false);
-				$('#emploi_localisation').focus();
-				return;
-			}else {
-				$('#emploi_localisation').removeClass('invalid');
-				$('#emploi_localisation').addClass('valid');
-				emploi_data.localisation = $('#emploi_localisation').val();
+			
+			emploi_data.localisation = $('#emploi_localisation :selected').val();
+			
+			// if ($('#emploi_descriptif').val().length < 20) {
+			// 	//show error and return
+			// 	$('#emploi_descriptif').addClass('invalid');
+			// 	$('form>.progress').hide();
+			// 	$('#update_emploi_btn').attr('disabled',false);
+			// 	$('#emploi_descriptif').focus();
+			// 	return;
+			// }else {
+			// 	$('#emploi_descriptif').removeClass('invalid');
+			// 	$('#emploi_descriptif').addClass('valid');
+			// 	emploi_data.descriptif = $('#emploi_descriptif').val();
+			// }
+			var content;
+			var editor = tinyMCE.get('emploi_descriptif');
+			if (editor) {
+				// Ok, the active tab is Visual
+				content = editor.getContent();
+			} else {
+				// The active tab is HTML, so just query the textarea
+				content = $('#'+'emploi_descriptif').val();
 			}
-			if ($('#emploi_descriptif').val().length < 20) {
-				//show error and return
-				$('#emploi_descriptif').addClass('invalid');
-				$('form>.progress').hide();
-				$('#update_emploi_btn').attr('disabled',false);
-				$('#emploi_descriptif').focus();
-				return;
-			}else {
-				$('#emploi_descriptif').removeClass('invalid');
-				$('#emploi_descriptif').addClass('valid');
-				emploi_data.descriptif = $('#emploi_descriptif').val();
+			emploi_data.descriptif = content;
+			content;
+			editor = tinyMCE.get('emploi_profile');
+			if (editor) {
+				// Ok, the active tab is Visual
+				content = editor.getContent();
+			} else {
+				// The active tab is HTML, so just query the textarea
+				content = $('#'+'emploi_profile').val();
 			}
-			if ($('#emploi_profile').val().length < 20) {
-				//show error and return
-				$('#emploi_profile').addClass('invalid');
-				$('form>.progress').hide();
-				$('#update_emploi_btn').attr('disabled',false);
-				$('#emploi_profile').focus();
-				return;
-			}else {
-				$('#emploi_profile').removeClass('invalid');
-				$('#emploi_profile').addClass('valid');
-				emploi_data.profile = $('#emploi_profile').val();
-			}
+			emploi_data.profile = content;
+			// if ($('#emploi_profile').val().length < 20) {
+			// 	//show error and return
+			// 	$('#emploi_profile').addClass('invalid');
+			// 	$('form>.progress').hide();
+			// 	$('#update_emploi_btn').attr('disabled',false);
+			// 	$('#emploi_profile').focus();
+			// 	return;
+			// }else {
+			// 	$('#emploi_profile').removeClass('invalid');
+			// 	$('#emploi_profile').addClass('valid');
+			// 	emploi_data.profile = $('#emploi_profile').val();
+			// }
 
 			var emailpattern = /^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i;
 			if (!$('#emploi_contact_rh').val().match(emailpattern) ) {
@@ -399,6 +410,8 @@
 			}
 
 			console.log(emploi_data);
+			
+			
 			//send Ajax request
 			$.ajax({
 				type : 'POST',
@@ -523,18 +536,9 @@
 				'value' : $('#emploi_fonction :selected').val(),
 				'label' : $('#emploi_fonction :selected').text()
 			};
-			if ($('#emploi_localisation').val().length < 3) {
-				//show error and return
-				$('#emploi_localisation').addClass('invalid');
-				$('form>.progress').hide();
-				$('#add_new_emploi_btn').attr('disabled',false);
-				$('#emploi_localisation').focus();
-				return;
-			}else {
-				$('#emploi_localisation').removeClass('invalid');
-				$('#emploi_localisation').addClass('valid');
-				emploi_data.localisation = $('#emploi_localisation').val();
-			}
+			
+				emploi_data.localisation = $('#emploi_localisation :selected').val();
+			
 			if ($('#emploi_descriptif').val().length < 20) {
 				//show error and return
 				$('#emploi_descriptif').addClass('invalid');
@@ -619,7 +623,7 @@
 			//send Ajax request
 			$.ajax({
 				type : 'POST',
-				url  : ajax_front_obj.ajax_url+'?action=add_new_sollicitation',
+				url  : ajax_front_obj.ajax_url+'?action=add_new_emploi',
 				data : emploi_data,
 				success : function (res) {
 					res = JSON.parse(res);

@@ -20,14 +20,31 @@ if (!is_user_logged_in() || $user_ID != $managerID || $emploi_ID == 0) {
 
 //var_dump(get_field('fiche_de_poste', $emploi_ID));
 
-$type_de_contrat = strtolower(get_field('type_de_contrat', $emploi_ID));
+$type_de_contrat = get_field('type_de_contrat', $emploi_ID)['value'];
 $fonction        = get_field('fonction', $emploi_ID)['value'];
+$localisation    = get_field('localisation', $emploi_ID)['value'];
+
+$field_fonction = get_field_object('field_5cd6fcbaaf352');
+$fonction_choices = $field_fonction['choices'];
+
+$field_type_contrat = get_field_object('field_5cb8f9edf7c23');
+$type_contrat_choices = $field_type_contrat['choices'];
+
+$field_localisatation = get_field_object('field_5cb8fbe0f8b2a');
+$localisatation_choices = $field_localisatation['choices'];
 //var_dump($fonction);
 
 
 
         
-get_header(); ?>
+get_header(); 
+
+$fla_emploi_tinymce_setting = array(
+    'media_buttons' => false,
+    'teeny'         => true
+);
+
+?>
 
 	<div id="primary" class="content-area">
 		<main id="main" class="site-main" role="main">
@@ -44,9 +61,13 @@ get_header(); ?>
                 <div class="row">
                     <div class="input-field col s12">
                         <select id="type_de_contrat" name="type_de_contrat">
-                            <option value="cdi" <?php if( $type_de_contrat == "cdi" ): ?> selected="selected"<?php endif; ?>>CDI</option>
-                            <option value="cdd" <?php if( $type_de_contrat == "cdd" ): ?> selected="selected"<?php endif; ?>>CDD</option>
-                            <option value="freelance" <?php if( $type_de_contrat == "freelance" ): ?> selected="selected"<?php endif; ?>>Freelance</option>
+                        <?php 
+                            foreach ($type_contrat_choices as $value => $label) {
+                                ?>
+                                <option value="<?php echo $value; ?>" <?php if( $type_de_contrat == $value ): ?> selected="selected"<?php endif; ?>><?php echo $label; ?></option>
+                                <?php
+                            }
+                        ?>
                         </select>
                         <label for="type_de_contrat">Type de contrat</label>
                     </div>
@@ -54,35 +75,41 @@ get_header(); ?>
                 <div class="row">
                     <div class="input-field col s12">
                         <select id="emploi_fonction" name="emploi_fonction">
-                            <option value="commercial" <?php if( $fonction == "commercial" ): ?> selected="selected"<?php endif; ?>>Commercial, vente</option>
-                            <option value="informatique" <?php if( $fonction == "informatique" ): ?> selected="selected"<?php endif; ?>>Informatique, nouvelles technologies</option>
-                            <option value="gestion" <?php if( $fonction == "gestion" ): ?> selected="selected"<?php endif; ?>>Gestion, comptabilité, finance</option>
-                            <option value="production" <?php if( $fonction == "production" ): ?> selected="selected"<?php endif; ?>>Production, maintenance, qualité</option>
-                            <option value="marketing" <?php if( $fonction == "marketing" ): ?> selected="selected"<?php endif; ?>>Marketing, communication</option>
-                            <option value="r_et_d" <?php if( $fonction == "r_et_d" ): ?> selected="selected"<?php endif; ?>>R&D, gestion de projets</option>
-                            <option value="rh" <?php if( $fonction == "rh" ): ?> selected="selected"<?php endif; ?>>RH, formation</option>
-                            <option value="secretariat" <?php if( $fonction == "secretariat" ): ?> selected="selected"<?php endif; ?>>Secretariat, assistanat</option>
-                            <option value="services" <?php if( $fonction == "services" ): ?> selected="selected"<?php endif; ?>>Métiers des services</option>
-                            <option value="management" <?php if( $fonction == "management" ): ?> selected="selected"<?php endif; ?>>Management, direction générale</option>
+                        <?php 
+                            foreach ($fonction_choices as $value => $label) {
+                                ?>
+                                <option value="<?php echo $value; ?>" <?php if( $fonction == $value ): ?> selected="selected"<?php endif; ?>><?php echo $label; ?></option>
+                                <?php
+                            }
+                        ?>
                         </select>
                         <label for="emploi_fonction">Fonction</label>
                     </div>
                 </div>
                 <div class="row">
                     <div class="input-field col s12">
-                        <input value="<?php the_field('localisation', $emploi_ID); ?>" id="emploi_localisation" type="text" class="validate">
+                    <select id="emploi_localisation" name="emploi_localisation">
+                    
+                        <?php
+                        foreach ($localisatation_choices as $value => $label) {
+                            ?>
+                            <option value="<?php echo $value; ?>" <?php if( $localisation == $value ): ?> selected="selected"<?php endif; ?>><?php echo $label; ?></option>
+                            <?php
+                        }
+                        ?>
+                        </select>
                         <label for="emploi_localisation">Localisation</label>
                     </div>
                 </div>
                 <div class="row">
                     <div class="input-field col s12">
-                        <textarea id="emploi_descriptif" type="text" class="materialize-textarea"><?php the_field('descriptif', $emploi_ID); ?></textarea>
+                        <?php wp_editor( get_field('descriptif', $emploi_ID), 'emploi_descriptif', $fla_emploi_tinymce_setting ); ?>
                         <label for="emploi_descriptif">Descriptif</label>
                     </div>
                 </div>
                 <div class="row">
                     <div class="input-field col s12">
-                        <textarea id="emploi_profile" type="text" class="materialize-textarea"><?php the_field('profil_recherche', $emploi_ID); ?></textarea>
+                        <?php wp_editor( get_field('profil_recherche', $emploi_ID), 'emploi_profile', $fla_emploi_tinymce_setting ); ?>
                         <label for="emploi_profile">Profile recherché</label>
                     </div>
                 </div>

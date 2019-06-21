@@ -34,11 +34,11 @@ get_header(); ?>
             <h2>Intitulé du post : </h2>
             <h3><?php the_title(); ?></h3>
             <h2>Type de Contrat : </h2>
-            <h3><?php the_field('type_de_contrat'); ?></h3>
+            <h3><?php echo get_field('type_de_contrat')['label']; ?></h3>
             <h2>Fonction : </h2>
             <h3><?php echo get_field('fonction')['label']; ?></h3>
             <h2>Localisation : </h2>
-            <h3><?php the_field('localisation'); ?></h3>
+            <h3><?php echo get_field('localisation')['label']; ?></h3>
             <h3><?php echo "(" . get_field('longitude') . "," . get_field('latitude') . ")"; ?></h3>
             <h2>Description du post : </h2>
             <p><?php the_field('descriptif'); ?></p>

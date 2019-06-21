@@ -110,54 +110,137 @@ class Fla_emploi_Public {
 
 	}
 
+	public function fla_emploi_paginationtemplate($query)
+	{
+		?>
+			<div class="pagination">
+				<?php 
+					echo paginate_links( array(
+						'base'         => str_replace( 999999999, '%#%', esc_url( get_pagenum_link( 999999999 ) ) ),
+						'total'        => $query->max_num_pages,
+						'current'      => max( 1, get_query_var( 'paged' ) ),
+						'format'       => '?paged=%#%',
+						'show_all'     => false,
+						'type'         => 'plain',
+						'end_size'     => 2,
+						'mid_size'     => 1,
+						'prev_next'    => true,
+						'prev_text'    => sprintf( '<i></i> %1$s', __( 'Précedent', 'text-domain' ) ),
+						'next_text'    => sprintf( '%1$s <i></i>', __( 'Suivant', 'text-domain' ) ),
+						'add_args'     => false,
+						'add_fragment' => '',
+					) );
+				?>
+			</div>
+		<?php
+	}
+
 	public function fl_search_fillter_widget(){
 		$type_de_contrat = isset($_GET['type_de_contrat']) ? $_GET['type_de_contrat'] : '';
 		$fonction = isset($_GET['fonction']) ? $_GET['fonction'] : '';
+
+		$field_fonction = get_field_object('field_5cd6fcbaaf352');
+		$fonction_choices = $field_fonction['choices'];
+
+		$field_type_contrat = get_field_object('field_5cb8f9edf7c23');
+		$type_contrat_choices = $field_type_contrat['choices'];
 		?>
 		<form id="fl_emploi_search_form">
 		<div>
 			<label for="type_de_contrat">Type de Contrat</label>
 			<select name="type_de_contrat">
 				<option value="tout" <?php if( $type_de_contrat == "tout" ): ?> selected="selected"<?php endif; ?>>Tout</option>
-				<option value="cdi" <?php if( $type_de_contrat == "cdi" ): ?> selected="selected"<?php endif; ?>>CDI</option>
-				<option value="cdd" <?php if( $type_de_contrat == "cdd" ): ?> selected="selected"<?php endif; ?>>CDD</option>
-				<option value="freelance" <?php if( $type_de_contrat == "freelance" ): ?> selected="selected"<?php endif; ?>>Freelance</option>
+				<?php 
+					foreach ($type_contrat_choices as $value => $label) {
+						?>
+						<option value="<?php echo $value; ?>" <?php if( $type_de_contrat == $value ): ?> selected="selected"<?php endif; ?>><?php echo $label; ?></option>
+						<?php
+					}
+				?>
 			</select>
 		</div>
 		<div>
 			<label for="fonction">Fonction</label>
 			<select name="fonction">
 			<option value="tout" <?php if( $fonction == "tout" ): ?> selected="selected"<?php endif; ?>>Tout</option>
-			<option value="commercial" <?php if( $fonction == "commercial" ): ?> selected="selected"<?php endif; ?>>Commercial, vente</option>
-			<option value="informatique" <?php if( $fonction == "informatique" ): ?> selected="selected"<?php endif; ?>>Informatique, nouvelles technologies</option>
-			<option value="gestion" <?php if( $fonction == "gestion" ): ?> selected="selected"<?php endif; ?>>Gestion, comptabilité, finance</option>
-			<option value="production" <?php if( $fonction == "production" ): ?> selected="selected"<?php endif; ?>>Production, maintenance, qualité</option>
-			<option value="marketing" <?php if( $fonction == "marketing" ): ?> selected="selected"<?php endif; ?>>Marketing, communication</option>
-			<option value="r_et_d" <?php if( $fonction == "r_et_d" ): ?> selected="selected"<?php endif; ?>>R&D, gestion de projets</option>
-			<option value="rh" <?php if( $fonction == "rh" ): ?> selected="selected"<?php endif; ?>>RH, formation</option>
-			<option value="secretariat" <?php if( $fonction == "secretariat" ): ?> selected="selected"<?php endif; ?>>Secretariat, assistanat</option>
-			<option value="services" <?php if( $fonction == "services" ): ?> selected="selected"<?php endif; ?>>Métiers des services</option>
-			<option value="management" <?php if( $fonction == "management" ): ?> selected="selected"<?php endif; ?>>Management, direction générale</option>
+			<?php 
+				foreach ($fonction_choices as $value => $label) {
+					?>
+					<option value="<?php echo $value; ?>" <?php if( $fonction == $value ): ?> selected="selected"<?php endif; ?>><?php echo $label; ?></option>
+					<?php
+				}
+			?>
 			</select>
 		</div>
 		<div><button>Rechercher</button></div>
+		<?php
+			$sort_result_by  = isset($_GET['sort_result_by']) ? $_GET['sort_result_by'] : '';
+			?>	
+				<div>
+					<label for="sort_result_by">Classement</label>
+					<select name="sort_result_by" id="fla_emploi_sort_result_by" onchange="this.form.submit()">
+						<option value="0" <?php if($sort_result_by == "0"): ?> selected="selected"<?php endif; ?>>------</option>
+						<option value="1" <?php if($sort_result_by == "1"): ?> selected="selected"<?php endif; ?>>Date ascendant</option>
+						<option value="2" <?php if($sort_result_by == "2"): ?> selected="selected"<?php endif; ?>>Date descendant</option>
+						<option value="3" <?php if($sort_result_by == "3"): ?> selected="selected"<?php endif; ?>>Fonction</option>
+						<option value="4" <?php if($sort_result_by == "4"): ?> selected="selected"<?php endif; ?>>Type de contrat</option>
+					</select>
+				</div>
 		</form>
 		<?php
 	}//end function
 
 	public function fl_search_result_widget(){
+		
+		$sort_result_by  = isset($_GET['sort_result_by']) ? $_GET['sort_result_by'] : '';
 		$type_de_contrat = isset($_GET['type_de_contrat']) ? $_GET['type_de_contrat'] : '';
-		$fonction = isset($_GET['fonction']) ? $_GET['fonction'] : '';
+		$fonction        = isset($_GET['fonction']) ? $_GET['fonction'] : '';
+
+		$sort_meta_key = '';
+		$sort_by       = 'menu_order';
+		$sort_order    = 'ASC';
+		
+		switch ($sort_result_by) {
+			case '1':
+				$sort_meta_key = '';
+				$sort_by       = 'date';
+				$sort_order    = 'ASC';
+				break;
+			case '2':
+				$sort_meta_key = '';
+				$sort_by       = 'date';
+				$sort_order    = 'DESC';
+				break;
+			case '3':
+				$sort_meta_key = 'fonction';
+				$sort_by       = 'meta_value';
+				$sort_order    = 'ASC';
+				break;
+			case '4':
+				$sort_meta_key = 'type_de_contrat';
+				$sort_by       = 'meta_value';
+				$sort_order    = 'ASC';
+				break;
+			
+			default:
+				break;
+		}
+
+
+
 		echo "type de contra = " . $type_de_contrat;
 		
 			# code...
 			// WP_Query arguments
+			$paged = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
 			$args = array (
 				'post_type'              => array( 'fla_emploi' ),
 				'post_status'            => array( 'publish' ),
-				'nopaging'               => true,
-				'order'                  => 'ASC',
-				'orderby'                => 'menu_order',
+				'order'                  => $sort_order,
+				'meta_key'			     => $sort_meta_key,
+				'orderby'                => $sort_by,
+				'posts_per_page'         => 9,
+        		'paged'                  => $paged
 			);
 
 			$metaquery_arr = array(
@@ -188,11 +271,12 @@ class Fla_emploi_Public {
 			//var_dump($args);
 			// The Query
 			$emplois = new WP_Query( $args );
+			//var_dump($emplois);
 
 			// The Loop
 			if ( $emplois->have_posts() ) {
 				//var_dump($emplois);
-				echo "<h3>Nombre de resulta : " . count($emplois->posts) . "</h3>"
+				echo "<h3>Nombre de resulta : " . ($emplois->found_posts) . "</h3>"
 				?>
 				<div class="result_container">
 					<?php
@@ -206,6 +290,7 @@ class Fla_emploi_Public {
 									<h3><?php the_title(); ?></h3>
 									<em><?php echo get_the_modified_date(); ?></em>
 									<h5><?php the_field('type_de_contrat') ?></h5>
+									<h5><?php the_field('fonction') ?></h5>
 									<h5><?php the_field('localisation') ?></h5>
 									<?php 
 									$entreprise = get_field('entreprise');
@@ -226,7 +311,9 @@ class Fla_emploi_Public {
 					
 					<?php
 				}
-				?> </div> <?php
+				?> </div>
+				<?php $this->fla_emploi_paginationtemplate($emplois); ?>
+				 <?php
 			} else {
 				// no posts found
 				echo '<h2>aucun resultat</h2>';
@@ -241,6 +328,8 @@ class Fla_emploi_Public {
 	//sollicitations widgets
 	public function fl_search_sollicitation_fillter_widget(){
 		$fonction = isset($_GET['fonction']) ? $_GET['fonction'] : '';
+		$field_fonction = get_field_object('field_5cd6fcbaaf352');
+		$fonction_choices = $field_fonction['choices'];
 		?>
 		<form id="fl_sollicitation_search_form">
 
@@ -248,16 +337,13 @@ class Fla_emploi_Public {
 				<label for="fonction">Fonction</label>
 				<select name="fonction">
 				<option value="tout" <?php if( $fonction == "tout" ): ?> selected="selected"<?php endif; ?>>Tout</option>
-				<option value="commercial" <?php if( $fonction == "commercial" ): ?> selected="selected"<?php endif; ?>>Commercial, vente</option>
-				<option value="informatique" <?php if( $fonction == "informatique" ): ?> selected="selected"<?php endif; ?>>Informatique, nouvelles technologies</option>
-				<option value="gestion" <?php if( $fonction == "gestion" ): ?> selected="selected"<?php endif; ?>>Gestion, comptabilité, finance</option>
-				<option value="production" <?php if( $fonction == "production" ): ?> selected="selected"<?php endif; ?>>Production, maintenance, qualité</option>
-				<option value="marketing" <?php if( $fonction == "marketing" ): ?> selected="selected"<?php endif; ?>>Marketing, communication</option>
-				<option value="r_et_d" <?php if( $fonction == "r_et_d" ): ?> selected="selected"<?php endif; ?>>R&D, gestion de projets</option>
-				<option value="rh" <?php if( $fonction == "rh" ): ?> selected="selected"<?php endif; ?>>RH, formation</option>
-				<option value="secretariat" <?php if( $fonction == "secretariat" ): ?> selected="selected"<?php endif; ?>>Secretariat, assistanat</option>
-				<option value="services" <?php if( $fonction == "services" ): ?> selected="selected"<?php endif; ?>>Métiers des services</option>
-				<option value="management" <?php if( $fonction == "management" ): ?> selected="selected"<?php endif; ?>>Management, direction générale</option>
+					<?php
+					foreach ($fonction_choices as $value => $label) {
+						?>
+						<option value="<?php echo $value; ?>" <?php if( $fonction == $value ): ?> selected="selected"<?php endif; ?>><?php echo $label; ?></option>
+						<?php
+					}
+					?>
 				</select>
 			</div>
 
@@ -275,12 +361,15 @@ class Fla_emploi_Public {
 		
 			# code...
 			// WP_Query arguments
+			$paged = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
+
 			$args = array (
 				'post_type'              => array( 'fla_sollicitation' ),
 				'post_status'            => array( 'publish' ),
-				'nopaging'               => true,
 				'order'                  => 'ASC',
 				'orderby'                => 'menu_order',
+				'posts_per_page'         => 9,
+        		'paged'                  => $paged
 			);
 
 			$metaquery_arr = array(
@@ -304,7 +393,7 @@ class Fla_emploi_Public {
 			// The Loop
 			if ( $sollicitations->have_posts() ) {
 				//var_dump($sollicitations);
-				echo "<h3>Nombre de resulta : " . count($sollicitations->posts) . "</h3>"
+				echo "<h3>Nombre de resulta : " . ($sollicitations->found_posts) . "</h3>"
 				?>
 				<div class="result_container">
 					<?php
@@ -337,7 +426,9 @@ class Fla_emploi_Public {
 					
 					<?php
 				}
-				?> </div> <?php
+				?> </div>
+				<?php $this->fla_emploi_paginationtemplate($sollicitations); ?>
+				<?php
 			} else {
 				// no posts found
 				echo '<h2>aucun resultat</h2>';
