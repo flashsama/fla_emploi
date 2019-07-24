@@ -74,10 +74,10 @@ class Fla_emploi_Public {
 		 */
 
 		/* enqueue material icons */ 
-		wp_enqueue_style( $this->plugin_name.'_material_icons', 'https://fonts.googleapis.com/icon?family=Material+Icons', array(), $this->version, 'all' );
+		//wp_enqueue_style( $this->plugin_name.'_material_icons', 'https://fonts.googleapis.com/icon?family=Material+Icons', array(), $this->version, 'all' );
 
 		
-		wp_enqueue_style( $this->plugin_name.'_materializecss', plugin_dir_url( __FILE__ ) . 'css/materialize.min.css', array(), $this->version, 'all' );
+		// wp_enqueue_style( $this->plugin_name.'_materializecss', plugin_dir_url( __FILE__ ) . 'css/materialize.min.css', array(), $this->version, 'all' );
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/fla_emploi-public.css', array(), $this->version, 'all' );
 
 	}
@@ -113,7 +113,7 @@ class Fla_emploi_Public {
 	public function fla_emploi_paginationtemplate($query)
 	{
 		?>
-			<div class="pagination">
+			<nav class="jobs_pager flex space-center aligne-center">
 				<?php 
 					echo paginate_links( array(
 						'base'         => str_replace( 999999999, '%#%', esc_url( get_pagenum_link( 999999999 ) ) ),
@@ -121,7 +121,7 @@ class Fla_emploi_Public {
 						'current'      => max( 1, get_query_var( 'paged' ) ),
 						'format'       => '?paged=%#%',
 						'show_all'     => false,
-						'type'         => 'plain',
+						'type'         => 'list',
 						'end_size'     => 2,
 						'mid_size'     => 1,
 						'prev_next'    => true,
@@ -131,7 +131,7 @@ class Fla_emploi_Public {
 						'add_fragment' => '',
 					) );
 				?>
-			</div>
+			</nav>
 		<?php
 	}
 
@@ -144,48 +144,167 @@ class Fla_emploi_Public {
 
 		$field_type_contrat = get_field_object('field_5cb8f9edf7c23');
 		$type_contrat_choices = $field_type_contrat['choices'];
+
+		//var_dump($fonction_choices,$type_contrat_choices);
+		
+		$allresultsargs = array (
+			'post_type'              => array( 'fla_emploi' ),
+			'post_status'            => array( 'publish' ),
+			'nopaging'               => true
+		);
+		$allAvailableEmplois = new WP_Query($allresultsargs);
+		$allAvailableEmplois = $allAvailableEmplois->found_posts;
+		// var_dump($allAvailableEmplois);
+		$generalEmploiArgs = array (
+			'post_type'              => array( 'fla_emploi' ),
+			'post_status'            => array( 'publish' ),
+			'nopaging'               => true
+		);
+		//arrays to hold number of posts founds
+		$emploiCountsPerTypeContrat            = array();
+		$emploiCountsPerFonction               = array();
+		$emploiCountsPerfonctionPerContrat     = array();
+		$emploiCountsPerTypeContratPerFonction = array();
+
+
+		foreach ($type_contrat_choices as $value => $label) {
+			$generalEmploiArgs['meta_key'] = 'type_de_contrat';
+			$generalEmploiArgs['meta_value'] = $value;
+			//var_dump($value);
+			//var_dump($generalEmploiArgs);
+			$tmpQuery  = new WP_query($generalEmploiArgs);
+			$emploiCountsPerTypeContrat[$value] = $tmpQuery->found_posts;
+		}
+		if ($type_de_contrat != '' && $type_de_contrat !=  'tout') {
+
+			$args = array (
+				'post_type'     => array( 'fla_emploi' ),
+				'post_status'   => array( 'publish' ),
+				'nopaging'      => true
+			);
+
+			foreach ($fonction_choices as $value => $label) {
+				$metaquery_arr = array(
+					'relation'		=> 'AND'
+				);
+				$metaquery_arr[] = array(
+					'key'		=> 'type_de_contrat',
+					'value'		=> $type_de_contrat,
+					'compare'	=> '='
+				);
+				$args['meta_query'] = $metaquery_arr;
+				$metaquery_arr[] = array(
+					'key'		=> 'fonction',
+					'value'		=> $value,
+					'compare'	=> '='
+				);
+				$args['meta_query'] = $metaquery_arr;
+				
+				// var_dump($label);
+				// var_dump($args);
+				
+				$tmpQuery  = new WP_query($args);
+				//var_dump($tmpQuery);
+
+				$emploiCountsPerfonctionPerContrat[$value] = $tmpQuery->found_posts;
+				
+			}//end foreach
+		}//end if
+
+		if ($fonction != '' && $fonction !=  'tout') {
+
+			$args = array (
+				'post_type'     => array( 'fla_emploi' ),
+				'post_status'   => array( 'publish' ),
+				'nopaging'      => true
+			);
+
+			foreach ($type_contrat_choices as $value => $label) {
+				$metaquery_arr = array(
+					'relation'		=> 'AND'
+				);
+				$metaquery_arr[] = array(
+					'key'		=> 'fonction',
+					'value'		=> $fonction,
+					'compare'	=> '='
+				);
+				$args['meta_query'] = $metaquery_arr;
+				$metaquery_arr[] = array(
+					'key'		=> 'type_de_contrat',
+					'value'		=> $value,
+					'compare'	=> '='
+				);
+				$args['meta_query'] = $metaquery_arr;
+				
+				// var_dump($label);
+				// var_dump($args);
+				
+				$tmpQuery  = new WP_query($args);
+				//var_dump($tmpQuery);
+
+				$emploiCountsPerTypeContratPerFonction[$value] = $tmpQuery->found_posts;
+				
+			}//end foreach
+		}//end if
+
+		foreach ($fonction_choices as $value => $label) {
+			$generalEmploiArgs['meta_key'] = 'fonction';
+			$generalEmploiArgs['meta_value'] = $value;
+			//var_dump($value);
+			//var_dump($generalEmploiArgs);
+			$tmpQuery  = new WP_query($generalEmploiArgs);
+			$emploiCountsPerFonction[$value] = $tmpQuery->found_posts;
+		}//end foreach
+
+		//var_dump($emploiCountsPerFonction);
+		//var_dump($emploiCountsPerTypeContrat);
+		// var_dump($emploiCountsPerfonctionPerContrat);
+		// var_dump($emploiCountsPerTypeContratPerFonction);
+		
+
 		?>
 		<form id="fl_emploi_search_form">
-		<div>
-			<label for="type_de_contrat">Type de Contrat</label>
-			<select name="type_de_contrat">
-				<option value="tout" <?php if( $type_de_contrat == "tout" ): ?> selected="selected"<?php endif; ?>>Tout</option>
+
+			<select class="jobs_filters_select" name="type_de_contrat" id="type_contrat_select">
+				<option value="tout" <?php if( $type_de_contrat == "tout" ): ?> selected="selected"<?php endif; ?>><?php echo __('Type de Contrat','perigord'); ?></option>
 				<?php 
+
+					$counts = ($fonction != '' && $fonction !=  'tout')?$emploiCountsPerTypeContratPerFonction:$emploiCountsPerTypeContrat;
 					foreach ($type_contrat_choices as $value => $label) {
+						if((int)$counts[$value] == 0){continue;}
 						?>
-						<option value="<?php echo $value; ?>" <?php if( $type_de_contrat == $value ): ?> selected="selected"<?php endif; ?>><?php echo $label; ?></option>
+						<option value="<?php echo $value; ?>" <?php if( $type_de_contrat == $value ): ?> selected="selected"<?php endif; ?>><?php echo $label; ?> #<?php echo $counts[$value]; ?></option>
 						<?php
 					}
 				?>
 			</select>
-		</div>
-		<div>
-			<label for="fonction">Fonction</label>
-			<select name="fonction">
-			<option value="tout" <?php if( $fonction == "tout" ): ?> selected="selected"<?php endif; ?>>Tout</option>
+
+
+			<select class="jobs_filters_select" name="fonction" id="fonction_select">
+			<option value="tout" <?php if( $fonction == "tout" ): ?> selected="selected"<?php endif; ?>><?php echo __('Fonction','perigord'); ?></option>
 			<?php 
+				$counts = ($type_de_contrat != '' && $type_de_contrat !=  'tout')?$emploiCountsPerfonctionPerContrat:$emploiCountsPerFonction;
 				foreach ($fonction_choices as $value => $label) {
+					if((int)$counts[$value] == 0){continue;}
 					?>
-					<option value="<?php echo $value; ?>" <?php if( $fonction == $value ): ?> selected="selected"<?php endif; ?>><?php echo $label; ?></option>
+					<option value="<?php echo $value; ?>" <?php if( $fonction == $value ): ?> selected="selected"<?php endif; ?>><?php echo $label; ?> #<?php echo $counts[$value]; ?></option>
 					<?php
 				}
 			?>
 			</select>
-		</div>
-		<div><button>Rechercher</button></div>
-		<?php
-			$sort_result_by  = isset($_GET['sort_result_by']) ? $_GET['sort_result_by'] : '';
-			?>	
-				<div>
-					<label for="sort_result_by">Classement</label>
-					<select name="sort_result_by" id="fla_emploi_sort_result_by" onchange="this.form.submit()">
-						<option value="0" <?php if($sort_result_by == "0"): ?> selected="selected"<?php endif; ?>>------</option>
-						<option value="1" <?php if($sort_result_by == "1"): ?> selected="selected"<?php endif; ?>>Date ascendant</option>
-						<option value="2" <?php if($sort_result_by == "2"): ?> selected="selected"<?php endif; ?>>Date descendant</option>
-						<option value="3" <?php if($sort_result_by == "3"): ?> selected="selected"<?php endif; ?>>Fonction</option>
-						<option value="4" <?php if($sort_result_by == "4"): ?> selected="selected"<?php endif; ?>>Type de contrat</option>
-					</select>
-				</div>
+			
+			<?php	$sort_result_by  = isset($_GET['sort_result_by']) ? $_GET['sort_result_by'] : ''; ?>	
+				
+				<select name="sort_result_by" id="fla_emploi_sort_result_by" onchange="this.form.submit()">
+					<option value="0" <?php if($sort_result_by == "0"): ?> selected="selected"<?php endif; ?>><?php echo __('Classement','perigord'); ?></option>
+					<option value="1" <?php if($sort_result_by == "1"): ?> selected="selected"<?php endif; ?>>Date ascendant</option>
+					<option value="2" <?php if($sort_result_by == "2"): ?> selected="selected"<?php endif; ?>>Date descendant</option>
+					<option value="3" <?php if($sort_result_by == "3"): ?> selected="selected"<?php endif; ?>>Fonction</option>
+					<option value="4" <?php if($sort_result_by == "4"): ?> selected="selected"<?php endif; ?>>Type de contrat</option>
+				</select>
+
+			<button class="jobs_filters_btn">Filtrer</button>
+		
 		</form>
 		<?php
 	}//end function
@@ -228,7 +347,7 @@ class Fla_emploi_Public {
 
 
 
-		echo "type de contra = " . $type_de_contrat;
+		//echo "type de contra = " . $type_de_contrat;
 		
 			# code...
 			// WP_Query arguments
@@ -278,40 +397,59 @@ class Fla_emploi_Public {
 				//var_dump($emplois);
 				echo "<h3>Nombre de resulta : " . ($emplois->found_posts) . "</h3>"
 				?>
-				<div class="result_container">
+				<!-- <div class="result_container"> -->
+				<ul class="jobs_list flex space-between">
 					<?php
 				while ( $emplois->have_posts() ) {
 					$emplois->the_post();
 					?>
-					
-						<div class="result_item">
-							<a href="<?php the_permalink(); ?>">
-								<div>
-									<h3><?php the_title(); ?></h3>
-									<em><?php echo get_the_modified_date(); ?></em>
-									<h5><?php the_field('type_de_contrat') ?></h5>
-									<h5><?php the_field('fonction') ?></h5>
-									<h5><?php the_field('localisation') ?></h5>
-									<?php 
+						<li class="jobs_list_item">
+
+							<div class="jobs_item_figure flex space-center align-center">
+								<?php 
 									$entreprise = get_field('entreprise');
 									if( $entreprise ): ?>
 										<?php foreach( $entreprise as $p): // variable must be called $p (IMPORTANT)
 											//var_dump($p);
 											?>
-												<h2><?php echo get_the_title($p->ID); ?></h2>
-												<img style="height: 100px;" src="<?php echo get_field('logo', $p->ID)['url']; ?>" />
+												<!-- <h2><?php //echo get_the_title($p->ID); ?></h2> -->
+												<img src="<?php echo get_field('logo', $p->ID)['url']; ?>" alt="" class="jobs_item_logo">
 										<?php endforeach; ?>
 										
-									<?php endif; 
-									?>
-									<p><?php echo substr(get_field('descriptif'),0,120).'...';  ?></p>
+								<?php endif; ?>
+							</div>
+
+							<div class="jobs_item_summary">
+
+								<div class="jobs_item_date caps">
+									<?php echo get_the_modified_date(); ?>
 								</div>
-							</a>
-						</div>
+
+								<h2 class="jobs_item_title caps">
+									<?php the_title(); ?>
+								</h2>
+
+								<div class="jobs_item_tags caps">
+									<?php the_field('type_de_contrat'); ?> - <?php the_field('fonction') ?> - <?php echo get_field('localisation')['label']; ?>
+								</div>
+
+								<div class="jobs_item_description">
+									<?php echo substr(get_field('descriptif'),0,120).'...';  ?>
+								</div>
+
+								<a href="<?php the_permalink(); ?>" class="jobs_item_link flex space-center align-center strong fs">
+									<span class="link_txt">Détails</span>
+								</a>
+
+							</div>
+
+						</li>
 					
 					<?php
 				}
-				?> </div>
+				?> 
+				</ul>
+				<!-- </div> -->
 				<?php $this->fla_emploi_paginationtemplate($emplois); ?>
 				 <?php
 			} else {
@@ -1103,6 +1241,52 @@ class Fla_emploi_Public {
 			echo  json_encode($output);
 			wp_die();
 		}
+
+		echo  json_encode($output);
+		wp_die();
+	}//end function
+
+	public function fla_emploi_get_result_counts_by_contrat()
+	{
+		//init output object
+		$output = new StdClass();
+		$output->status = 'success';
+		$output->errorText = '';
+		$output->result = '';
+
+		//collect data
+		$fonction = isset($_POST['fonction'])?(int)$_POST['fonction']:0;
+
+		$field_type_contrat = get_field_object('field_5cb8f9edf7c23');
+		$type_contrat_choices = $field_type_contrat['choices'];
+
+
+		$emploiCountsPerTypeContratPerFonction = array();
+		foreach ($type_contrat_choices as $value => $label) {
+			$metaquery_arr = array(
+				'relation'		=> 'AND'
+			);
+			$metaquery_arr[] = array(
+				'key'		=> 'fonction',
+				'value'		=> 1,
+				'compare'	=> '='
+			);
+			$args['meta_query'] = $metaquery_arr;
+			$metaquery_arr[] = array(
+				'key'		=> 'type_de_contrat',
+				'value'		=> $value,
+				'compare'	=> '='
+			);
+			$args['meta_query'] = $metaquery_arr;
+			
+			
+			$tmpQuery  = new WP_query($args);
+
+			$emploiCountsPerTypeContratPerFonction[$value] = $tmpQuery->found_posts;
+			
+		}//end foreach
+
+		$output->result = json_encode($emploiCountsPerTypeContratPerFonction);
 
 		echo  json_encode($output);
 		wp_die();

@@ -205,6 +205,7 @@ class Fla_emploi {
 		$this->loader->add_action( 'wp_ajax_delete_sollicitation', $plugin_public, 'fla_emploi_delete_sollicitation' );
 		$this->loader->add_action( 'wp_ajax_archive_emploi', $plugin_public, 'fla_emploi_archive_emploi' );
 		$this->loader->add_action( 'wp_ajax_archive_sollicitation', $plugin_public, 'fla_emploi_archive_sollicitation' );
+		$this->loader->add_action( 'wp_ajax_getResultCountsBycontrat', $plugin_public, 'fla_emploi_get_result_counts_by_contrat' );
 		
 
 		//filter

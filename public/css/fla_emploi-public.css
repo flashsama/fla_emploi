@@ -3,14 +3,6 @@
  * included in this file.
  */
 
- form#fl_emploi_search_form {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-column-gap: 1rem;
-    justify-content: end;
-    align-items: end;
- }
-
  div.result_container {
     display: grid;
     padding: 2rem 0;
@@ -58,6 +50,10 @@ textarea {
 
 .collection.fla_emploi_ul>.collection-item {
    line-height: 2.5rem;
+}
+
+label.tiny_editor {
+   top:-44px !important;
 }
 /* .btn {
    display: inline-block;

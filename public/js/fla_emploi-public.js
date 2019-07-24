@@ -32,7 +32,7 @@
 	$(function() {
 		
 		//init select element of materialize css lib
-		$('select').formSelect();
+		//$('select').formSelect();
 		//init modal element of materialize css lib
 		$('.modal').modal();
 
@@ -539,30 +539,50 @@
 			
 				emploi_data.localisation = $('#emploi_localisation :selected').val();
 			
-			if ($('#emploi_descriptif').val().length < 20) {
-				//show error and return
-				$('#emploi_descriptif').addClass('invalid');
-				$('form>.progress').hide();
-				$('#add_new_emploi_btn').attr('disabled',false);
-				$('#emploi_descriptif').focus();
-				return;
-			}else {
-				$('#emploi_descriptif').removeClass('invalid');
-				$('#emploi_descriptif').addClass('valid');
-				emploi_data.descriptif = $('#emploi_descriptif').val();
+			// if ($('#emploi_descriptif').val().length < 20) {
+			// 	//show error and return
+			// 	$('#emploi_descriptif').addClass('invalid');
+			// 	$('form>.progress').hide();
+			// 	$('#add_new_emploi_btn').attr('disabled',false);
+			// 	$('#emploi_descriptif').focus();
+			// 	return;
+			// }else {
+			// 	$('#emploi_descriptif').removeClass('invalid');
+			// 	$('#emploi_descriptif').addClass('valid');
+			// 	emploi_data.descriptif = $('#emploi_descriptif').val();
+			// }
+			// if ($('#emploi_profile').val().length < 20) {
+			// 	//show error and return
+			// 	$('#emploi_profile').addClass('invalid');
+			// 	$('form>.progress').hide();
+			// 	$('#add_new_emploi_btn').attr('disabled',false);
+			// 	$('#emploi_profile').focus();
+			// 	return;
+			// }else {
+			// 	$('#emploi_profile').removeClass('invalid');
+			// 	$('#emploi_profile').addClass('valid');
+			// 	emploi_data.profile = $('#emploi_profile').val();
+			// }
+			var content;
+			var editor = tinyMCE.get('emploi_descriptif');
+			if (editor) {
+				// Ok, the active tab is Visual
+				content = editor.getContent();
+			} else {
+				// The active tab is HTML, so just query the textarea
+				content = $('#'+'emploi_descriptif').val();
 			}
-			if ($('#emploi_profile').val().length < 20) {
-				//show error and return
-				$('#emploi_profile').addClass('invalid');
-				$('form>.progress').hide();
-				$('#add_new_emploi_btn').attr('disabled',false);
-				$('#emploi_profile').focus();
-				return;
-			}else {
-				$('#emploi_profile').removeClass('invalid');
-				$('#emploi_profile').addClass('valid');
-				emploi_data.profile = $('#emploi_profile').val();
+			emploi_data.descriptif = content;
+			content;
+			editor = tinyMCE.get('emploi_profile');
+			if (editor) {
+				// Ok, the active tab is Visual
+				content = editor.getContent();
+			} else {
+				// The active tab is HTML, so just query the textarea
+				content = $('#'+'emploi_profile').val();
 			}
+			emploi_data.profile = content;
 
 			var emailpattern = /^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i;
 			if (!$('#emploi_contact_rh').val().match(emailpattern) ) {
@@ -926,6 +946,34 @@
 				}
 			});
 		});//end click
+
+		//var $fonction_select = $('#fonction_select').formSelect();
+		$('#fonction_select').change(function(e){
+			e.preventDefault();
+			//$('#type_contrat_select').prop('disabled',true);
+			//$('select').formSelect();
+
+			var data = {};
+			data.fonction = $('#fonction_select :selected').val();
+
+			$.ajax({
+				type    : 'POST',
+				url     : ajax_front_obj.ajax_url+'?action=getResultCountsBycontrat',
+				data    : data,
+				success : function(res){
+					console.log(res);
+					res = JSON.parse(res);
+					console.log(res);
+				}
+			});
+
+		});
+		$('#type_contrat_select').change(function(e){
+			e.preventDefault();
+			alert('changed type contrat');
+		});
+
+
 
 	 });
 })( jQuery );

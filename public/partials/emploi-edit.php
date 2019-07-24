@@ -110,13 +110,13 @@ $fla_emploi_tinymce_setting = array(
                 <div class="row">
                     <div class="input-field col s12">
                         <?php wp_editor( get_field('profil_recherche', $emploi_ID), 'emploi_profile', $fla_emploi_tinymce_setting ); ?>
-                        <label for="emploi_profile">Profile recherché</label>
+                        <label for="emploi_profile" class="tiny_editor">Profile recherché</label>
                     </div>
                 </div>
                 <div class="row">
                     <div class="input-field col s12">
                         <input value="<?php the_field('contact_rh', $emploi_ID); ?>" id="emploi_contact_rh" type="text" class="validate">
-                        <label for="emploi_contact_rh">Contact RH</label>
+                        <label for="emploi_contact_rh" class="tiny_editor">Contact RH</label>
                     </div>
                 </div>
                 <div class="row">

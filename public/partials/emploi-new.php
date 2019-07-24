@@ -31,6 +31,12 @@ $type_contrat_choices = $field_type_contrat['choices'];
 
 $field_localisatation = get_field_object('field_5cb8fbe0f8b2a');
 $localisatation_choices = $field_localisatation['choices'];
+
+$fla_emploi_tinymce_setting = array(
+    'media_buttons' => false,
+    'teeny'         => true,
+    'quicktags'     => false
+);
         
 get_header(); ?>
 
@@ -90,14 +96,14 @@ get_header(); ?>
                 </div>
                 <div class="row">
                     <div class="input-field col s12">
-                        <textarea id="emploi_descriptif" type="text" class="materialize-textarea"></textarea>
-                        <label for="emploi_descriptif">Descriptif</label>
+                        <?php wp_editor( '', 'emploi_descriptif', $fla_emploi_tinymce_setting ); ?>
+                        <label for="emploi_descriptif" class="tiny_editor">Descriptif</label>
                     </div>
                 </div>
                 <div class="row">
                     <div class="input-field col s12">
-                        <textarea id="emploi_profile" type="text" class="materialize-textarea"></textarea>
-                        <label for="emploi_profile">Profile recherché</label>
+                        <?php wp_editor( '', 'emploi_profile', $fla_emploi_tinymce_setting ); ?>
+                        <label for="emploi_profile" class="tiny_editor">Profile recherché</label>
                     </div>
                 </div>
                 <div class="row">
